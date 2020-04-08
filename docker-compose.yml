@@ -1,0 +1,13 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7
+    tmpfs:
+      - /var/lib/mysql:rw
+    environment:
+      - MYSQL_ROOT_PASSWORD=appuser
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=appuser
+      - MYSQL_DATABASE=droptoken
+    ports:
+      - "3306:3306"

@@ -1,0 +1,11 @@
+http:
+  port: 8080
+  instances: 1
+  
+datasource:
+  port: 3306
+  host: localhost
+  database: droptoken
+  user: appuser
+  password: appuser
+  
