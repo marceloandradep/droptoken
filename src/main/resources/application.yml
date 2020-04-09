@@ -8,4 +8,7 @@ datasource:
   database: droptoken
   user: appuser
   password: appuser
-  
+
+game:
+  max-players: 4
+  max-board: 8
