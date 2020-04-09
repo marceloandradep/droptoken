@@ -19,7 +19,8 @@ public class DefaultPlayerSet implements PlayerSet {
         currentPlayer = 0;
         activePlayersCount = players.length;
         
-        int token = 1, index = 0;
+        byte token = 1;
+        int index = 0;
         for (String id : ids) {
             players[index++] = new Player(id, token++, true);
         }

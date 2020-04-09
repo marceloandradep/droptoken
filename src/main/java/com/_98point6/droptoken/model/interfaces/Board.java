@@ -14,7 +14,7 @@ public interface Board {
      * @param column
      * @return
      */
-    boolean dropToken(Integer token, Integer column);
+    boolean dropToken(byte token, int column);
 
     /**
      * Check if the board is full

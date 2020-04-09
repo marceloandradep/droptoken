@@ -64,7 +64,8 @@ public class GameTest {
     @Test(expected = IllegalMoveException.class)
     public void when_a_player_tries_to_drop_token_in_a_invalid_column_should_throw_error() {
         String playerId = "valid";
-        int token = 1, column = 0;
+        byte token = 1;
+        int column = 0;
         
         Player player = new Player(playerId, token, true);
         
@@ -82,7 +83,8 @@ public class GameTest {
     @Test
     public void when_a_player_makes_a_move_and_the_game_continues() {
         String playerId = "valid";
-        int token = 1, column = 0;
+        byte token = 1;
+        int column = 0;
 
         Player player = new Player(playerId, token, true);
         Move move = Move.dropTokenAt(playerId, column);
@@ -108,7 +110,8 @@ public class GameTest {
     @Test
     public void when_a_player_makes_a_move_and_the_game_draws() {
         String playerId = "valid";
-        int token = 1, column = 0;
+        byte token = 1;
+        int column = 0;
 
         Player player = new Player(playerId, token, true);
         Move move = Move.dropTokenAt(playerId, column);
@@ -134,7 +137,8 @@ public class GameTest {
     @Test
     public void when_a_player_makes_a_move_and_wins_the_game() {
         String playerId = "valid";
-        int token = 1, column = 0;
+        byte token = 1;
+        int column = 0;
 
         Player player = new Player(playerId, token, true);
         Move move = Move.dropTokenAt(playerId, column);
@@ -201,7 +205,7 @@ public class GameTest {
     public void when_one_player_quits_and_one_player_remains_the_game_should_finish() {
         String playerId = "valid";
 
-        Player player = new Player("winner", 1, true);
+        Player player = new Player("winner", (byte)1, true);
         Move move = Move.quit(playerId);
 
         when(playerSet.contains(playerId)).thenReturn(true);

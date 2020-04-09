@@ -3,11 +3,11 @@ package com._98point6.droptoken.model;
 public class Player {
 
     private String id;
-    private Integer token;
+    private byte token;
     
     private boolean playing;
 
-    public Player(String id, Integer token, boolean playing) {
+    public Player(String id, byte token, boolean playing) {
         this.id = id;
         this.token = token;
         this.playing = playing;
@@ -17,7 +17,7 @@ public class Player {
         return id;
     }
 
-    public Integer getToken() {
+    public byte getToken() {
         return token;
     }
 
