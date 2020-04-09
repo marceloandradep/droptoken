@@ -85,7 +85,7 @@ public class GameTest {
         int token = 1, column = 0;
 
         Player player = new Player(playerId, token, true);
-        Move move = Move.dropTokenAt(0, playerId, column);
+        Move move = Move.dropTokenAt(playerId, column);
 
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
@@ -111,7 +111,7 @@ public class GameTest {
         int token = 1, column = 0;
 
         Player player = new Player(playerId, token, true);
-        Move move = Move.dropTokenAt(0, playerId, column);
+        Move move = Move.dropTokenAt(playerId, column);
 
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
@@ -137,7 +137,7 @@ public class GameTest {
         int token = 1, column = 0;
 
         Player player = new Player(playerId, token, true);
-        Move move = Move.dropTokenAt(0, playerId, column);
+        Move move = Move.dropTokenAt(playerId, column);
 
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
@@ -182,7 +182,7 @@ public class GameTest {
     public void when_one_player_quits_and_there_is_many_players_left_the_game_should_continue() {
         String playerId = "valid";
         
-        Move move = Move.quit(0, playerId);
+        Move move = Move.quit(playerId);
         
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.activePlayersCount()).thenReturn(2);
@@ -202,7 +202,7 @@ public class GameTest {
         String playerId = "valid";
 
         Player player = new Player("winner", 1, true);
-        Move move = Move.quit(0, playerId);
+        Move move = Move.quit(playerId);
 
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.activePlayersCount()).thenReturn(1);
