@@ -66,7 +66,7 @@ public class GameTest {
         String playerId = "valid";
         int token = 1, column = 0;
         
-        Player player = new Player(playerId, token);
+        Player player = new Player(playerId, token, true);
         
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
@@ -84,7 +84,7 @@ public class GameTest {
         String playerId = "valid";
         int token = 1, column = 0;
 
-        Player player = new Player(playerId, token);
+        Player player = new Player(playerId, token, true);
         Move move = Move.dropTokenAt(0, playerId, column);
 
         when(playerSet.contains(playerId)).thenReturn(true);
@@ -110,7 +110,7 @@ public class GameTest {
         String playerId = "valid";
         int token = 1, column = 0;
 
-        Player player = new Player(playerId, token);
+        Player player = new Player(playerId, token, true);
         Move move = Move.dropTokenAt(0, playerId, column);
 
         when(playerSet.contains(playerId)).thenReturn(true);
@@ -136,7 +136,7 @@ public class GameTest {
         String playerId = "valid";
         int token = 1, column = 0;
 
-        Player player = new Player(playerId, token);
+        Player player = new Player(playerId, token, true);
         Move move = Move.dropTokenAt(0, playerId, column);
 
         when(playerSet.contains(playerId)).thenReturn(true);
@@ -201,7 +201,7 @@ public class GameTest {
     public void when_one_player_quits_and_one_player_remains_the_game_should_finish() {
         String playerId = "valid";
 
-        Player player = new Player("winner", 1);
+        Player player = new Player("winner", 1, true);
         Move move = Move.quit(0, playerId);
 
         when(playerSet.contains(playerId)).thenReturn(true);
