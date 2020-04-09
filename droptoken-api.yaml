@@ -1,0 +1,283 @@
+openapi: 3.0.0
+
+info:
+  title: Drop Token
+  version: v1
+
+components:
+  schemas:
+    game_post:
+      properties:
+        players:
+          type: array
+          items:
+            type: string
+          example:
+            ["player1", "player2"]
+        columns:
+          type: integer
+          example: 4
+        rows:
+          type: integer
+          example: 4
+
+    game_id:
+      properties:
+        gameId:
+          type: string
+          example: "some_string_token"
+
+    game_state:
+      properties:
+        players:
+          type: array
+          items:
+            type: string
+          example:
+            ["player1", "player2"]
+        state:
+          type: string
+          enum: [DONE, IN_PROGRESS]
+          example: "IN_PROGRESS"
+        winner:
+          type: string
+          example: "player1"
+
+    move:
+      properties:
+        type:
+          type: string
+          enum: [MOVE, QUIT]
+        player:
+          type: string
+          example: "player1"
+        column:
+          type: integer
+          example: 1
+
+    move_post:
+      properties:
+        column:
+          type: integer
+          example: 2
+
+    move_created:
+      properties:
+        move:
+          type: string
+          example: "{gameId}/moves/{move_number}"
+
+tags:
+  - name: game
+    description: Game related endpoints
+
+  - name: move
+    description: Player and moves related endpoints
+
+paths:
+  /drop_token:
+    get:
+      summary: Return all in-progress games
+      tags:
+        - game
+      responses:
+        200:
+          description: Success.
+          content:
+            application/json:
+              example:
+                games: ["gameid1", "gameid2"]
+
+    post:
+      summary: Create a new game
+      tags:
+        - game
+      requestBody:
+        description: Game configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/game_post'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/game_id'
+        400:
+          description: Malformed request
+
+  /drop_token/{gameId}:
+    parameters:
+      - name: gameId
+        in: path
+        description: Game ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: "42aee870-79f5-11ea-bc55-0242ac130003"
+    get:
+      summary: Get the state of the game
+      tags:
+        - game
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/game_state'
+              examples:
+                done:
+                  value:
+                    players: ["player1", "player2"]
+                    state: "DONE"
+                    winner: "player1"
+                draw:
+                  value:
+                    players: ["player1", "player2"]
+                    state: "DONE"
+                    winner: null
+                in progress:
+                  value:
+                    players: ["player1", "player2"]
+                    state: "IN_PROGRESS"
+        400:
+          description: Malformed request
+        404:
+          description: Game/moves not found
+
+  /drop_token/{gameId}/moves:
+    parameters:
+      - name: gameId
+        in: path
+        description: Game ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: "42aee870-79f5-11ea-bc55-0242ac130003"
+    get:
+      summary: Get (sub) list of the moves played
+      tags:
+        - move
+      parameters:
+        - name: start
+          in: query
+          description: First move
+          schema:
+            type: integer
+            example: 0
+        - name: until
+          in: query
+          description: Until move
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/move'
+              example:
+                moves:
+                  - type: "MOVE"
+                    player: "player1"
+                    column: 1
+                  - type: "QUIT"
+                    player: "player2"
+        400:
+          description: Malformed request
+        404:
+          description: Game/moves not found
+
+  /drop_token/{gameId}/moves/{move_number}:
+    parameters:
+      - name: gameId
+        in: path
+        description: Game ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: "42aee870-79f5-11ea-bc55-0242ac130003"
+      - name: move_number
+        in: path
+        description: Move number
+        required: true
+        schema:
+          type: integer
+          example: 0
+    get:
+      summary: Return the move
+      tags:
+        - move
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/move'
+        400:
+          description: Malformed input or illegal move
+        404:
+          description: Game/moves not found
+
+  /drop_token/{gameId}/{playerId}:
+    parameters:
+      - name: gameId
+        in: path
+        description: Game ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: "42aee870-79f5-11ea-bc55-0242ac130003"
+      - name: playerId
+        in: path
+        description: Player ID
+        required: true
+        schema:
+          type: string
+          example: "player1"
+    post:
+      summary: Post a move
+      tags:
+        - move
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/move_post'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/move_created'
+        400:
+          description: Malformed input or illegal move
+        404:
+          description: Game not found or player is not a part of it
+        409:
+          description: Player tried to post when it's not their turn
+    delete:
+      summary: Player quits from game
+      tags:
+        - move
+      responses:
+        202:
+          description: Success
+        404:
+          description: Game fot found or player is not a part of it
+        410:
+          description: Game is already in DONE state
