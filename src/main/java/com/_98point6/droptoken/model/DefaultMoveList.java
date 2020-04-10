@@ -14,17 +14,17 @@ public class DefaultMoveList implements MoveList {
     }
     
     @Override
-    public Move addDropToken(String player, int column) {
+    public int addDropToken(String player, int column) {
         Move move = Move.dropTokenAt(player, column);
         moves.add(move);
-        return move;
+        return moves.size() - 1;
     }
 
     @Override
-    public Move addQuit(String player) {
+    public int addQuit(String player) {
         Move move = Move.quit(player);
         moves.add(move);
-        return move;
+        return moves.size() - 1;
     }
 
     @Override

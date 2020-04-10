@@ -14,16 +14,16 @@ public interface MoveList {
      * Add a drop token move to the list
      * @param player
      * @param column
-     * @return
+     * @return Move index
      */
-    Move addDropToken(String player, int column);
+    int addDropToken(String player, int column);
 
     /**
      * Add a quit move to the list
      * @param player
-     * @return
+     * @return Move index
      */
-    Move addQuit(String player);
+    int addQuit(String player);
     
     List<Move> getMoves();
     

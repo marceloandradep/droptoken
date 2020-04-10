@@ -34,7 +34,7 @@ public class Game {
         state = GameState.IN_PROGRESS;
     }
 
-    public Move dropToken(String playerId, int column) {
+    public int dropToken(String playerId, int column) {
         if (isDone()) {
             throw new IllegalMoveException();
         }
@@ -67,7 +67,7 @@ public class Game {
         return moveList.addDropToken(playerId, column);
     }
     
-    public Move quit(String playerId) {
+    public int quit(String playerId) {
         if (isDone()) {
             throw new IllegalMoveException();
         }

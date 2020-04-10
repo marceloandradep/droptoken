@@ -87,8 +87,7 @@ public class GameTest {
         int column = 0;
 
         Player player = new Player(playerId, token, true);
-        Move move = Move.dropTokenAt(playerId, column);
-
+        
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
         when(playerSet.getCurrentPlayer()).thenReturn(player);
@@ -97,14 +96,14 @@ public class GameTest {
         when(board.isFull()).thenReturn(false);
         when(board.hasWinner()).thenReturn(false);
         
-        when(moveList.addDropToken(playerId, column)).thenReturn(move);
+        when(moveList.addDropToken(playerId, column)).thenReturn(0);
 
-        Move actualMove = game.dropToken(playerId, column);
+        int index = game.dropToken(playerId, column);
 
         verify(playerSet).next();
         assertFalse(game.isDone());
         assertNull(game.getWinner());
-        assertEquals(move, actualMove);
+        assertEquals(0, index);
     }
 
     @Test
@@ -114,8 +113,7 @@ public class GameTest {
         int column = 0;
 
         Player player = new Player(playerId, token, true);
-        Move move = Move.dropTokenAt(playerId, column);
-
+        
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
         when(playerSet.getCurrentPlayer()).thenReturn(player);
@@ -124,14 +122,14 @@ public class GameTest {
         when(board.isFull()).thenReturn(true);
         when(board.hasWinner()).thenReturn(false);
 
-        when(moveList.addDropToken(playerId, column)).thenReturn(move);
+        when(moveList.addDropToken(playerId, column)).thenReturn(0);
 
-        Move actualMove = game.dropToken(playerId, column);
+        int index = game.dropToken(playerId, column);
 
         verify(playerSet).next();
         assertTrue(game.isDone());
         assertNull(game.getWinner());
-        assertEquals(move, actualMove);
+        assertEquals(0, index);
     }
 
     @Test
@@ -141,8 +139,7 @@ public class GameTest {
         int column = 0;
 
         Player player = new Player(playerId, token, true);
-        Move move = Move.dropTokenAt(playerId, column);
-
+        
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.isPlayerTurn(playerId)).thenReturn(true);
         when(playerSet.getCurrentPlayer()).thenReturn(player);
@@ -151,14 +148,14 @@ public class GameTest {
         when(board.isFull()).thenReturn(false);
         when(board.hasWinner()).thenReturn(true);
 
-        when(moveList.addDropToken(playerId, column)).thenReturn(move);
+        when(moveList.addDropToken(playerId, column)).thenReturn(0);
 
-        Move actualMove = game.dropToken(playerId, column);
+        int index = game.dropToken(playerId, column);
 
         verify(playerSet).next();
         assertTrue(game.isDone());
         assertEquals(playerId, game.getWinner());
-        assertEquals(move, actualMove);
+        assertEquals(0, index);
     }
     
     @Test(expected = IllegalMoveException.class)
@@ -186,17 +183,15 @@ public class GameTest {
     public void when_one_player_quits_and_there_is_many_players_left_the_game_should_continue() {
         String playerId = "valid";
         
-        Move move = Move.quit(playerId);
-        
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.activePlayersCount()).thenReturn(2);
-        when(moveList.addQuit(playerId)).thenReturn(move);
+        when(moveList.addQuit(playerId)).thenReturn(0);
 
-        Move actualMove = game.quit(playerId);
+        int index = game.quit(playerId);
         
         verify(playerSet).remove(playerId);
         
-        assertEquals(move, actualMove);
+        assertEquals(0, index);
         assertFalse(game.isDone());
         assertNull(game.getWinner());
     }
@@ -206,18 +201,17 @@ public class GameTest {
         String playerId = "valid";
 
         Player player = new Player("winner", (byte)1, true);
-        Move move = Move.quit(playerId);
-
+        
         when(playerSet.contains(playerId)).thenReturn(true);
         when(playerSet.activePlayersCount()).thenReturn(1);
         when(playerSet.getSinglePlayerLeft()).thenReturn(player);
-        when(moveList.addQuit(playerId)).thenReturn(move);
+        when(moveList.addQuit(playerId)).thenReturn(0);
 
-        Move actualMove = game.quit(playerId);
+        int index = game.quit(playerId);
 
         verify(playerSet).remove(playerId);
 
-        assertEquals(move, actualMove);
+        assertEquals(0, index);
         assertTrue(game.isDone());
         assertEquals(player.getId(), game.getWinner());
     }
