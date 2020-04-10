@@ -1,6 +1,7 @@
 package com._98point6.droptoken.model;
 
 import com._98point6.droptoken.model.constants.MoveType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class Move {
     
@@ -31,6 +32,7 @@ public class Move {
         return player;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer getColumn() {
         return column;
     }

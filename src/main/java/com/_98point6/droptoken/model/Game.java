@@ -115,7 +115,6 @@ public class Game {
         return state;
     }
 
-    //@JsonInclude(JsonInclude.Include.NON_NULL)
     public String getWinner() {
         return winner;
     }

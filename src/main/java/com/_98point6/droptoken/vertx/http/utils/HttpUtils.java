@@ -30,6 +30,11 @@ public class HttpUtils {
     
     public static <T> T getParam(RoutingContext ctx, String name, Class<T> clazz) {
         String param = ctx.request().getParam(name);
+        
+        if (param == null) {
+            return null;
+        }
+        
         Object value = null;        
         
         if (Long.class.isAssignableFrom(clazz)) {
