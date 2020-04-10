@@ -80,7 +80,14 @@ public class MoveHandler {
     }
     
     public void quit(RoutingContext context) {
-        
+        logger.info("Handling DELETE " + context.request().path());
+
+        String gameId = HttpUtils.getParam(context, "gameId", String.class);
+        String playerId = HttpUtils.getParam(context, "playerId", String.class);
+
+        moveService
+                .quit(gameId, playerId)
+                .subscribe(() -> HttpUtils.accepted(context), e -> HttpUtils.handleFailure(context, e));
     }
     
     private Map<String, List<Move>> wrapMoveList(List<Move> moves) {

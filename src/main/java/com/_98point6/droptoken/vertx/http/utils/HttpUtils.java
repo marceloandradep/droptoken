@@ -54,12 +54,15 @@ public class HttpUtils {
         return mapper.readValue(ctx.getBodyAsString(), clazz);
     }
     
-    public static void created(RoutingContext ctx, Object response) {
-        jsonResponse(ctx, response, HttpResponseStatus.CREATED.code());
-    }
-
     public static void ok(RoutingContext ctx, Object response) {
         jsonResponse(ctx, response, HttpResponseStatus.OK.code());
+    }
+
+    public static void accepted(RoutingContext ctx) {
+        ctx
+                .response()
+                .setStatusCode(HttpResponseStatus.ACCEPTED.code())
+                .end();
     }
     
     private static void jsonResponse(RoutingContext ctx, Object response, int statusCode) {

@@ -1,5 +1,6 @@
 package com._98point6.droptoken.model;
 
+import com._98point6.droptoken.exceptions.GameDoneException;
 import com._98point6.droptoken.exceptions.IllegalMoveException;
 import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
@@ -69,7 +70,7 @@ public class Game {
     
     public int quit(String playerId) {
         if (isDone()) {
-            throw new IllegalMoveException();
+            throw new GameDoneException();
         }
 
         if (!playerSet.contains(playerId)) {

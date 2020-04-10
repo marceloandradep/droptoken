@@ -37,5 +37,9 @@ public class MoveRoutes implements RoutesBuilder {
                 .handler(factory.getSchemaValidationHandler("move-post"))
                 .handler(moveHandler::dropToken);
         
+        router
+                .delete("/drop_token/:gameId/:playerId")
+                .handler(moveHandler::quit);
+        
     }
 }

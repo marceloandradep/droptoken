@@ -1,15 +1,16 @@
 package com._98point6.droptoken.handlers;
 
+import com._98point6.droptoken.exceptions.GameDoneException;
 import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
 import com._98point6.droptoken.handlers.dto.DropTokenDTO;
-import com._98point6.droptoken.handlers.dto.GameRequestDTO;
 import com._98point6.droptoken.model.Game;
 import com._98point6.droptoken.model.Move;
 import com._98point6.droptoken.model.Player;
 import com._98point6.droptoken.model.factories.GameFactory;
 import com._98point6.droptoken.services.MoveService;
 import com._98point6.droptoken.tests.HttpIntegrationBase;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import org.assertj.core.api.Assertions;
 import org.json.JSONArray;
@@ -20,10 +21,12 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -210,6 +213,63 @@ public class MoveHandlerIntegrationTest extends HttpIntegrationBase {
 
         String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
         restTemplate.postForEntity(url, dropTokenRequest, String.class);
+
+        fail();
+    }
+
+    @Test
+    public void when_quitting_should_return_accepted() {
+        Game game = new Game(null, null, null);
+        Player player = new Player("player1", (byte)1, true);
+
+        when(moveService.quit(game.getId(), player.getId())).thenReturn(Completable.complete());
+
+        String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
+        
+        RequestEntity requestEntity =
+                RequestEntity
+                        .delete(URI.create(url))
+                        .build();
+
+        ResponseEntity response = restTemplate.exchange(requestEntity, String.class);
+        
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+    }
+
+    @Test(expected = HttpClientErrorException.NotFound.class)
+    public void when_quitting_and_game_not_found_should_return_not_found() {
+        Game game = new Game(null, null, null);
+        Player player = new Player("player1", (byte)1, true);
+
+        when(moveService.quit(game.getId(), player.getId())).thenReturn(Completable.error(NotFoundException::new));
+
+        String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
+
+        RequestEntity requestEntity =
+                RequestEntity
+                        .delete(URI.create(url))
+                        .build();
+
+        restTemplate.exchange(requestEntity, String.class);
+
+        fail();
+    }
+
+    @Test(expected = HttpClientErrorException.Gone.class)
+    public void when_quitting_and_game_already_finished_should_return_gone() {
+        Game game = new Game(null, null, null);
+        Player player = new Player("player1", (byte)1, true);
+
+        when(moveService.quit(game.getId(), player.getId())).thenReturn(Completable.error(GameDoneException::new));
+
+        String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
+
+        RequestEntity requestEntity =
+                RequestEntity
+                        .delete(URI.create(url))
+                        .build();
+
+        restTemplate.exchange(requestEntity, String.class);
 
         fail();
     }
