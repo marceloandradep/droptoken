@@ -30,7 +30,7 @@ import static com._98point6.droptoken.vertx.factories.SpringVerticleFactory.spri
         HttpIntegrationBase.class, Application.class
 })
 @ActiveProfiles("test")
-public class HttpIntegrationBase {
+public abstract class HttpIntegrationBase {
     
     @Value("http://localhost:${http.port}")
     public String baseUrl;

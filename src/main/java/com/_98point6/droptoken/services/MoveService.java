@@ -18,7 +18,7 @@ public class MoveService {
         return null;
     }
     
-    public Single<Move> dropToken(String gameId, String playerId) {
+    public Single<Integer> dropToken(String gameId, String playerId, int column) {
         return null;
     }
     

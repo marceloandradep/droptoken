@@ -16,19 +16,26 @@ public class MoveRoutes implements RoutesBuilder {
     private ValidationHandlerFactory factory;
     
     @Autowired
-    private MoveHandler gameHandler;
+    private MoveHandler moveHandler;
     
     @Override
     public void build(Router router) {
         router
                 .get("/drop_token/:gameId/moves")
                 .produces(CONTENT_TYPE_APPLICATION_JSON)
-                .handler(gameHandler::getMoves);
+                .handler(moveHandler::getMoves);
 
         router
                 .get("/drop_token/:gameId/moves/:moveNumber")
                 .produces(CONTENT_TYPE_APPLICATION_JSON)
-                .handler(gameHandler::getMove);
+                .handler(moveHandler::getMove);
+
+        router
+                .post("/drop_token/:gameId/:playerId")
+                .consumes(CONTENT_TYPE_APPLICATION_JSON)
+                .produces(CONTENT_TYPE_APPLICATION_JSON)
+                .handler(factory.getSchemaValidationHandler("move-post"))
+                .handler(moveHandler::dropToken);
         
     }
 }

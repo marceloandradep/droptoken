@@ -1,9 +1,11 @@
 package com._98point6.droptoken.handlers;
 
 import com._98point6.droptoken.exceptions.IllegalMoveException;
+import com._98point6.droptoken.handlers.dto.DropTokenDTO;
 import com._98point6.droptoken.model.Move;
 import com._98point6.droptoken.services.MoveService;
 import com._98point6.droptoken.vertx.http.utils.HttpUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +60,23 @@ public class MoveHandler {
     }
     
     public void dropToken(RoutingContext context) {
+        logger.info("Handling POST " + context.request().path());
+
+        String gameId = HttpUtils.getParam(context, "gameId", String.class);
+        String playerId = HttpUtils.getParam(context, "playerId", String.class);
+
+        DropTokenDTO dropTokenRequest = null;
+        try {
+            dropTokenRequest = HttpUtils.parseBody(context, DropTokenDTO.class);
+        } catch (JsonProcessingException e) {
+            HttpUtils.handleFailure(context, e);
+            return;
+        }
         
+        moveService
+                .dropToken(gameId, playerId, dropTokenRequest.getColumn())
+                .map(moveNumber -> wrapMove(gameId, moveNumber))
+                .subscribe(d -> HttpUtils.ok(context, d), e -> HttpUtils.handleFailure(context, e));
     }
     
     public void quit(RoutingContext context) {
@@ -68,6 +86,12 @@ public class MoveHandler {
     private Map<String, List<Move>> wrapMoveList(List<Move> moves) {
         HashMap<String, List<Move>> response = new HashMap<>();
         response.put("moves", moves);
+        return response;
+    }
+    
+    private Map<String, String> wrapMove(String gameId, Integer moveNumber) {
+        HashMap<String, String> response = new HashMap<>();
+        response.put("move", gameId + "/moves/" + moveNumber);
         return response;
     }
     

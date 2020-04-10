@@ -1,9 +1,12 @@
 package com._98point6.droptoken.handlers;
 
 import com._98point6.droptoken.exceptions.NotFoundException;
+import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
+import com._98point6.droptoken.handlers.dto.DropTokenDTO;
 import com._98point6.droptoken.handlers.dto.GameRequestDTO;
 import com._98point6.droptoken.model.Game;
 import com._98point6.droptoken.model.Move;
+import com._98point6.droptoken.model.Player;
 import com._98point6.droptoken.model.factories.GameFactory;
 import com._98point6.droptoken.services.MoveService;
 import com._98point6.droptoken.tests.HttpIntegrationBase;
@@ -156,6 +159,58 @@ public class MoveHandlerIntegrationTest extends HttpIntegrationBase {
         String url = baseUrl + "/drop_token/" + game.getId() + "/moves/0";
         restTemplate.getForEntity(url, String.class);
         
+        fail();
+    }
+
+    @Test
+    public void when_posting_a_move_should_create_it_and_return_the_move_url_in_the_response_body() throws JSONException {
+        Game game = new Game(null, null, null);
+        Player player = new Player("player1", (byte)1, true);
+        
+        DropTokenDTO dropTokenRequest = new DropTokenDTO(2);
+
+        when(moveService.dropToken(game.getId(), player.getId(), dropTokenRequest.getColumn())).thenReturn(Single.just(0));
+
+        String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
+        ResponseEntity<String> response = restTemplate.postForEntity(url, dropTokenRequest, String.class);
+        String actual = response.getBody();
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JSONObject expected =
+                new JSONObject()
+                        .put("move", game.getId() + "/moves/" + 0);
+
+        JSONAssert.assertEquals(expected.toString(), actual, true);
+    }
+
+    @Test(expected = HttpClientErrorException.NotFound.class)
+    public void when_posting_a_move_and_game_or_player_is_not_found_should_return_not_found() throws JSONException {
+        Game game = new Game(null, null, null);
+        Player player = new Player("player1", (byte)1, true);
+
+        DropTokenDTO dropTokenRequest = new DropTokenDTO(2);
+
+        when(moveService.dropToken(game.getId(), player.getId(), dropTokenRequest.getColumn())).thenReturn(Single.error(NotFoundException::new));
+
+        String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
+        restTemplate.postForEntity(url, dropTokenRequest, String.class);
+        
+        fail();
+    }
+
+    @Test(expected = HttpClientErrorException.Conflict.class)
+    public void when_posting_a_move_and_player_is_out_of_turn_should_return_conflict() throws JSONException {
+        Game game = new Game(null, null, null);
+        Player player = new Player("player1", (byte)1, true);
+
+        DropTokenDTO dropTokenRequest = new DropTokenDTO(2);
+
+        when(moveService.dropToken(game.getId(), player.getId(), dropTokenRequest.getColumn())).thenReturn(Single.error(PlayerOutOfTurnException::new));
+
+        String url = baseUrl + "/drop_token/" + game.getId() + "/" + player.getId();
+        restTemplate.postForEntity(url, dropTokenRequest, String.class);
+
         fail();
     }
     
