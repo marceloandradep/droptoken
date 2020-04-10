@@ -2,7 +2,12 @@ package com._98point6.droptoken.tests;
 
 import com._98point6.droptoken.Application;
 import com._98point6.droptoken.vertx.http.HttpVerticle;
+import com._98point6.droptoken.vertx.mysql.RxMySQLImpl;
+import com._98point6.droptoken.vertx.mysql.api.RxMySQL;
+import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.reactivex.core.Vertx;
+import io.vertx.reactivex.mysqlclient.MySQLPool;
+import io.vertx.sqlclient.PoolOptions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +36,10 @@ import static com._98point6.droptoken.vertx.factories.SpringVerticleFactory.spri
 })
 @ActiveProfiles("test")
 public abstract class HttpIntegrationBase {
+    private static final String HOST = "localhost";
+    private static final String DATABASE = "droptoken";
+    private static final String USER = "appuser";
+    private static final String PASSWORD = "appuser";
     
     public String baseUrl;
     
@@ -48,6 +57,27 @@ public abstract class HttpIntegrationBase {
         
         int port = factory.getPort();
         baseUrl = "http://localhost:" + port;
+    }
+
+    @Bean
+    public MySQLPool mySQLPool() {
+
+        MySQLConnectOptions connectOptions = new MySQLConnectOptions()
+                .setPort(3306)
+                .setHost(HOST)
+                .setDatabase(DATABASE)
+                .setUser(USER)
+                .setPassword(PASSWORD);
+
+        PoolOptions poolOptions = new PoolOptions()
+                .setMaxSize(5);
+
+        return MySQLPool.pool(connectOptions, poolOptions);
+    }
+
+    @Bean
+    public RxMySQL rxMySQL(MySQLPool mySQLPool) {
+        return new RxMySQLImpl(mySQLPool);
     }
 
     @Bean

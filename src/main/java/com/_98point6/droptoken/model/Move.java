@@ -1,6 +1,7 @@
 package com._98point6.droptoken.model;
 
 import com._98point6.droptoken.model.constants.MoveType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class Move {
@@ -44,6 +45,7 @@ public class Move {
         return column;
     }
 
+    @JsonIgnore
     public Long getId() {
         return id;
     }

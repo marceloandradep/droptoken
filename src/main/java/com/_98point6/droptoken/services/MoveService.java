@@ -30,13 +30,23 @@ public class MoveService {
     public Single<Integer> dropToken(String gameId, String playerId, int column) {
         return gameRepository
                 .getGame(gameId)
-                .map(game -> game.dropToken(playerId, column));
+                .flatMap(game -> {
+                    int move = game.dropToken(playerId, column);
+                    return gameRepository
+                            .update(game)
+                            .toSingle(() -> move);
+                });
     }
     
     public Completable quit(String gameId, String playerId) {
         return gameRepository
                 .getGame(gameId)
-                .map(game -> game.quit(playerId))
+                .flatMap(game -> {
+                    int move = game.quit(playerId);
+                    return gameRepository
+                            .update(game)
+                            .toSingle(() -> move);
+                })
                 .ignoreElement();
     }
     

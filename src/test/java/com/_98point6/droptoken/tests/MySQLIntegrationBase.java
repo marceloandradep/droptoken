@@ -35,7 +35,7 @@ import java.util.List;
         MySQLIntegrationBase.class, Application.class
 })
 @ActiveProfiles("test")
-public class MySQLIntegrationBase {
+public abstract class MySQLIntegrationBase {
     
     private static final int PORT = 3306;
     private static final String HOST = "localhost";
