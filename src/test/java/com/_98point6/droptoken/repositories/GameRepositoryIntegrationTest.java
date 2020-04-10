@@ -13,7 +13,6 @@ import com._98point6.droptoken.processors.MoveProcessor;
 import com._98point6.droptoken.processors.PlayerProcessor;
 import com._98point6.droptoken.tests.MySQLIntegrationBase;
 import com.ninja_squad.dbsetup.DbSetupTracker;
-import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,8 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.assertj.db.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 public class GameRepositoryIntegrationTest extends MySQLIntegrationBase {
 
@@ -88,13 +87,10 @@ public class GameRepositoryIntegrationTest extends MySQLIntegrationBase {
         assertEquals(game.getId(), persisted.getId());
         assertEquals(GameState.DONE, persisted.getState());
     }
-    
+
     @Test
-    public void should_save_game() {
+    public void should_save_new_game() {
         Game game = gameFactory.createGame(Arrays.asList("player1", "player2"), 4);
-        
-        game.dropToken("player1", 0);
-        game.quit("player2");
 
         game = gameRepository.save(game).blockingGet();
 
@@ -104,56 +100,17 @@ public class GameRepositoryIntegrationTest extends MySQLIntegrationBase {
                 .value().isEqualTo(game.getId())
                 .value().isEqualTo(game.getState().toString())
                 .value().isEqualTo(game.getBoard().getSize());
-        
+
         assertThat(playersTable)
                 .hasNumberOfRows(2)
                 .row()
-                .value().isEqualTo("player1")
-                .value().isEqualTo(game.getId())
-                .row()
-                .value().isEqualTo("player2")
-                .value().isEqualTo(game.getId());
-
-        assertThat(movesTable)
-                .hasNumberOfRows(2)
-                .row()
                 .value().isEqualTo(1)
-                .value().isEqualTo("MOVE")
                 .value().isEqualTo("player1")
-                .value().isEqualTo(0)
                 .value().isEqualTo(game.getId())
                 .row()
                 .value().isEqualTo(2)
-                .value().isEqualTo("QUIT")
                 .value().isEqualTo("player2")
-                .value().isNull()
                 .value().isEqualTo(game.getId());
     }
-    
-    /*@Test
-    public void should_save_a_department() {
-        Department department = from(Department.class).gimme(DepartmentFixtures.NEW);
-        
-        department = gameR.save(department).blockingGet();
-
-        assertThat(gamesTable)
-                .hasNumberOfRows(1)
-                .row()
-                .value().isEqualTo(department.getId())
-                .value().isEqualTo(department.getName());
-    }
-    
-    @Test
-    public void should_find_a_department_by_id() {
-        Department department = 
-                from(Department.class)
-                        .uses(departmentProcessor)
-                        .gimme(DepartmentFixtures.PERSISTED);
-        
-        Department persistedDepartment = gameR.findByID(department.getId()).blockingGet();
-
-        assertEquals(department.getId(), persistedDepartment.getId());
-        assertEquals(department.getName(), persistedDepartment.getName());
-    }*/
     
 }

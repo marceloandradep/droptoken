@@ -1,5 +1,6 @@
 package com._98point6.droptoken.vertx.mysql;
 
+import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.vertx.mysql.api.RxMySQL;
 import com._98point6.droptoken.vertx.mysql.api.RxRowMapper;
 import com._98point6.droptoken.vertx.mysql.exceptions.EmptyResultException;
@@ -58,7 +59,7 @@ public class RxMySQLImpl implements RxMySQL {
     
     private <T> T handleSingle(RowSet<Row> rows, RxRowMapper<T> rowMapper) {
         if (rows.size() == 0) {
-            throw new EmptyResultException();
+            throw new NotFoundException();
         }
         
         if (rows.size() > 1) {

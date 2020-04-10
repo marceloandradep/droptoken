@@ -33,7 +33,7 @@ public class MoveService {
                 .flatMap(game -> {
                     int move = game.dropToken(playerId, column);
                     return gameRepository
-                            .update(game)
+                            .saveMove(game, game.getMove(move))
                             .toSingle(() -> move);
                 });
     }
@@ -44,7 +44,7 @@ public class MoveService {
                 .flatMap(game -> {
                     int move = game.quit(playerId);
                     return gameRepository
-                            .update(game)
+                            .saveMove(game, game.getMove(move))
                             .toSingle(() -> move);
                 })
                 .ignoreElement();

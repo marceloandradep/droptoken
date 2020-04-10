@@ -1,7 +1,7 @@
 version: '2'
 services:
   mysql:
-    image: mysql:5.7
+    image: droptoken-mysql
     tmpfs:
       - /var/lib/mysql:rw
     environment:

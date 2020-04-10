@@ -20,10 +20,10 @@ public class GameRepository {
 
     private static final String SELECT_GAMES_IN_PROGRESS = "SELECT Game_ID, State FROM Games WHERE State = 'IN_PROGRESS'";
     private static final String SELECT_GAME_BY_ID = "SELECT Game_ID, State, Size FROM Games WHERE Game_ID = ?";
-    private static final String SELECT_PLAYERS_BY_GAME_ID = "SELECT Player_ID FROM Players WHERE Game_ID = ?";
+    private static final String SELECT_PLAYERS_BY_GAME_ID = "SELECT Name FROM Players WHERE Game_ID = ?";
     private static final String SELECT_MOVES_BY_GAME_ID = "SELECT Move_ID, MoveType, Player, MoveColumn FROM Moves WHERE Game_ID = ? ORDER BY Move_ID";
     private static final String INSERT_INTO_GAMES = "INSERT INTO Games (Game_ID, State, Size) VALUES (?, ?, ?)";
-    private static final String INSERT_INTO_PLAYERS = "INSERT INTO Players (Player_ID, Game_ID) VALUES (?, ?)";
+    private static final String INSERT_INTO_PLAYERS = "INSERT INTO Players (Name, Game_ID) VALUES (?, ?)";
     private static final String INSERT_INTO_MOVES = "INSERT INTO Moves (MoveType, Player, MoveColumn, Game_ID) VALUES (?, ?, ?, ?)";
 
     @Autowired
@@ -44,12 +44,7 @@ public class GameRepository {
         return rxMySQL
                 .insert(INSERT_INTO_GAMES, game.getId(), game.getState().toString(), game.getBoard().getSize())
                 .flatMapCompletable(id -> savePlayers(game))
-                .andThen(updateMoves(game))
                 .toSingle(() -> game);
-    }
-    
-    public Completable update(Game game) {
-        return updateMoves(game);
     }
     
     private Completable savePlayers(Game game) {
@@ -60,18 +55,9 @@ public class GameRepository {
                 .ignoreElement();
     }
     
-    private Completable updateMoves(Game game) {
-        List<Move> moves = game.getMoves(null, null);
-        
-        if (moves.isEmpty()) {
-            return Completable.complete();
-        }
-        
-        return Observable
-                .fromIterable(moves)
-                .filter(move -> move.getId() == null)
-                .flatMapSingle(move -> rxMySQL.insert(INSERT_INTO_MOVES, move.getType().toString(), move.getPlayer(), move.getColumn(), game.getId()))
-                .lastOrError()
+    public Completable saveMove(Game game, Move move) {
+        return rxMySQL
+                .insert(INSERT_INTO_MOVES, move.getType().toString(), move.getPlayer(), move.getColumn(), game.getId())
                 .ignoreElement();
     }
     
@@ -83,7 +69,7 @@ public class GameRepository {
     
     public Single<Game> getGame(String gameId) {
         return rxMySQL
-                .selectMany(SELECT_PLAYERS_BY_GAME_ID, row -> row.getString("Player_ID"), gameId)
+                .selectMany(SELECT_PLAYERS_BY_GAME_ID, row -> row.getString("Name"), gameId)
                 .toList()
                 .flatMap(players -> createGame(gameId, players))
                 .flatMap(this::addMoves);

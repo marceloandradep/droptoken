@@ -23,7 +23,7 @@ public class PlayerProcessor {
 
     public void savePlayer(Game game, Player player) {
         Operation operation = insertInto("Players")
-                .columns("Player_ID", "Game_ID")
+                .columns("Name", "Game_ID")
                 .values(player.getId(), game.getId())
                 .build();
         

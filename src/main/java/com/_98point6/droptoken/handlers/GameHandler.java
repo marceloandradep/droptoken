@@ -32,7 +32,7 @@ public class GameHandler {
                 .flatMapObservable(Observable::fromIterable)
                 .map(Game::getId)
                 .toList()
-                .map(this::idListResponse)
+                .map(this::wrapIds)
                 .subscribe(d -> HttpUtils.ok(context, d), e -> HttpUtils.handleFailure(context, e));
     }
     
@@ -59,17 +59,17 @@ public class GameHandler {
 
         gameService
                 .createGame(gameRequest.getPlayers(), gameRequest.getColumns())
-                .map(this::idResponse)
+                .map(this::wrapId)
                 .subscribe(d -> HttpUtils.ok(context, d), e -> HttpUtils.handleFailure(context, e));
     }
     
-    private Map<String, String> idResponse(String id) {
+    private Map<String, String> wrapId(String id) {
         HashMap<String, String> response = new HashMap<>();
         response.put("gameId", id);
         return response;
     }
     
-    private Map<String, List<String>> idListResponse(List<String> ids) {
+    private Map<String, List<String>> wrapIds(List<String> ids) {
         HashMap<String, List<String>> response = new HashMap<>();
         response.put("games", ids);
         return response;
