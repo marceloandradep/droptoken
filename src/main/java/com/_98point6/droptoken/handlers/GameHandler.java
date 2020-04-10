@@ -1,11 +1,11 @@
 package com._98point6.droptoken.handlers;
 
+import com._98point6.droptoken.handlers.dto.GameRequestDTO;
 import com._98point6.droptoken.model.Game;
 import com._98point6.droptoken.services.GameService;
 import com._98point6.droptoken.vertx.http.utils.HttpUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.reactivex.Observable;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class GameHandler {
                 .flatMapObservable(Observable::fromIterable)
                 .map(Game::getId)
                 .toList()
-                .map(this::gameIdsResponse)
+                .map(this::idListResponse)
                 .subscribe(d -> HttpUtils.ok(context, d), e -> HttpUtils.handleFailure(context, e));
     }
     
@@ -46,7 +46,30 @@ public class GameHandler {
                 .subscribe(d -> HttpUtils.ok(context, d), e -> HttpUtils.handleFailure(context, e));
     }
     
-    private Map<String, List<String>> gameIdsResponse(List<String> ids) {
+    public void createGame(RoutingContext context) {
+        logger.info("Handling POST " + context.request().path());
+
+        GameRequestDTO gameRequest = null;
+        try {
+            gameRequest = HttpUtils.parseBody(context, GameRequestDTO.class);
+        } catch (JsonProcessingException e) {
+            HttpUtils.handleFailure(context, e);
+            return;
+        }
+
+        gameService
+                .createGame(gameRequest.getPlayers(), gameRequest.getColumns())
+                .map(this::idResponse)
+                .subscribe(d -> HttpUtils.ok(context, d), e -> HttpUtils.handleFailure(context, e));
+    }
+    
+    private Map<String, String> idResponse(String id) {
+        HashMap<String, String> response = new HashMap<>();
+        response.put("gameId", id);
+        return response;
+    }
+    
+    private Map<String, List<String>> idListResponse(List<String> ids) {
         HashMap<String, List<String>> response = new HashMap<>();
         response.put("games", ids);
         return response;

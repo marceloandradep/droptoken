@@ -17,4 +17,8 @@ public class GameService {
         return null;
     }
     
+    public Single<String> createGame(List<String> players, int size) {
+        return null;
+    }
+    
 }

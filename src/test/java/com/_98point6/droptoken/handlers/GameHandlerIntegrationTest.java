@@ -1,6 +1,7 @@
 package com._98point6.droptoken.handlers;
 
 import com._98point6.droptoken.exceptions.NotFoundException;
+import com._98point6.droptoken.handlers.dto.GameRequestDTO;
 import com._98point6.droptoken.model.Game;
 import com._98point6.droptoken.model.factories.GameFactory;
 import com._98point6.droptoken.services.GameService;
@@ -164,6 +165,37 @@ public class GameHandlerIntegrationTest extends HttpIntegrationBase {
         String url = baseUrl + "/drop_token/" + game.getId();
         restTemplate.getForEntity(url, String.class);
 
+        fail();
+    }
+
+    @Test
+    public void when_posting_a_valid_game_should_create_it_and_return_the_game_id_in_the_response_body() throws JSONException {
+        Game game = new Game(null, null, null);
+        GameRequestDTO gameRequest = new GameRequestDTO(Arrays.asList("player1", "player2"), 4, 4);
+        
+        when(gameService.createGame(gameRequest.getPlayers(), gameRequest.getColumns())).thenReturn(Single.just(game.getId()));
+
+        String url = baseUrl + "/drop_token";
+        ResponseEntity<String> response = restTemplate.postForEntity(url, gameRequest, String.class);
+        String actual = response.getBody();
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JSONObject expected =
+                new JSONObject()
+                        .put("gameId", game.getId());
+
+        JSONAssert.assertEquals(expected.toString(), actual, true);
+    }
+
+    @Test(expected = HttpClientErrorException.BadRequest.class)
+    public void when_posting_a_invalid_game_should_return_error() throws JSONException {
+        Game game = new Game(null, null, null);
+        GameRequestDTO gameRequest = new GameRequestDTO();
+
+        String url = baseUrl + "/drop_token";
+        restTemplate.postForEntity(url, gameRequest, String.class);
+        
         fail();
     }
     
