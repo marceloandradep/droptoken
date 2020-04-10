@@ -27,22 +27,27 @@ import static com._98point6.droptoken.vertx.factories.SpringVerticleFactory.spri
 @Configuration
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-        HttpIntegrationBase.class, Application.class
+        TestVerticleFactory.class, HttpIntegrationBase.class, Application.class
 })
 @ActiveProfiles("test")
 public abstract class HttpIntegrationBase {
     
-    @Value("http://localhost:${http.port}")
     public String baseUrl;
     
     @Autowired
     private Vertx vertx;
+
+    @Autowired
+    private TestVerticleFactory factory;
     
     @PostConstruct
     public void init() {
         vertx
                 .rxDeployVerticle(springify(HttpVerticle.class.getName()))
                 .blockingGet();
+        
+        int port = factory.getPort();
+        baseUrl = "http://localhost:" + port;
     }
 
     @Bean
@@ -63,6 +68,13 @@ public abstract class HttpIntegrationBase {
         c.setPropertySources(mps);
 
         return c;
+    }
+
+    @Bean
+    public Vertx vertx(TestVerticleFactory factory) {
+        Vertx vertx = Vertx.vertx();
+        vertx.getDelegate().registerVerticleFactory(factory);
+        return vertx;
     }
     
 }

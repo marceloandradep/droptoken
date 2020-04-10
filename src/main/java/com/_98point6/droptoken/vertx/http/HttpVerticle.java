@@ -58,6 +58,10 @@ public class HttpVerticle extends AbstractVerticle {
                 .ignoreElement();
     }
 
+    public void setHttpPort(int httpPort) {
+        this.httpPort = httpPort;
+    }
+
     private void handleSuccess(HttpServer httpServer) {
         logger.info("HTTP server running on port " + httpPort);
     }
