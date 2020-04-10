@@ -1,5 +1,6 @@
 package com._98point6.droptoken.model;
 
+import com._98point6.droptoken.exceptions.GameDoneException;
 import com._98point6.droptoken.exceptions.IllegalMoveException;
 import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
@@ -8,6 +9,10 @@ import com._98point6.droptoken.model.interfaces.MoveList;
 import com._98point6.droptoken.model.interfaces.PlayerSet;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -158,7 +163,7 @@ public class GameTest {
         assertEquals(0, index);
     }
     
-    @Test(expected = IllegalMoveException.class)
+    @Test(expected = GameDoneException.class)
     public void when_a_player_tries_to_quit_a_finished_game_should_throw_error() {
         String playerId = "valid";
         
@@ -214,5 +219,45 @@ public class GameTest {
         assertEquals(0, index);
         assertTrue(game.isDone());
         assertEquals(player.getId(), game.getWinner());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void when_getting_moves_and_there_is_any_should_throw_error() {
+        when(moveList.getMoves()).thenReturn(Collections.emptyList());
+
+        game.getMoves(0, 0);
+
+        fail();
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void when_move_filter_out_of_bounds_should_throw_error() {
+        List<Move> moves = Arrays.asList(Move.dropTokenAt("player1", 1));
+        
+        when(moveList.getMoves()).thenReturn(moves);
+
+        game.getMoves(0, 2);
+
+        fail();
+    }
+
+    @Test
+    public void when_getting_moves_with_null_filters_should_return_all_moves() {
+        List<Move> moves = 
+                Arrays.asList(Move.dropTokenAt("player1", 1), Move.dropTokenAt("player1", 1));
+
+        when(moveList.getMoves()).thenReturn(moves);
+
+        assertEquals(moves, game.getMoves(null, null));
+    }
+
+    @Test
+    public void when_getting_moves_with_filters_should_return_sublist_of_moves() {
+        List<Move> moves =
+                Arrays.asList(Move.dropTokenAt("player1", 1), Move.dropTokenAt("player1", 1));
+
+        when(moveList.getMoves()).thenReturn(moves);
+
+        assertEquals(1, game.getMoves(0, 1).size());
     }
 }

@@ -1,8 +1,10 @@
 package com._98point6.droptoken.services;
 
 import com._98point6.droptoken.model.Move;
+import com._98point6.droptoken.repositories.GameRepository;
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,20 +12,32 @@ import java.util.List;
 @Component
 public class MoveService {
     
+    @Autowired
+    private GameRepository gameRepository;
+    
     public Single<List<Move>> getMoves(String gameId, Integer start, Integer until) {
-        return null;
+        return gameRepository
+                .getGame(gameId)
+                .map(game -> game.getMoves(start, until));
     }
     
     public Single<Move> getMove(String gameId, int moveNumber) {
-        return null;
+        return gameRepository
+                .getGame(gameId)
+                .map(game -> game.getMove(moveNumber));
     }
     
     public Single<Integer> dropToken(String gameId, String playerId, int column) {
-        return null;
+        return gameRepository
+                .getGame(gameId)
+                .map(game -> game.dropToken(playerId, column));
     }
     
     public Completable quit(String gameId, String playerId) {
-        return null;
+        return gameRepository
+                .getGame(gameId)
+                .map(game -> game.quit(playerId))
+                .ignoreElement();
     }
     
 }

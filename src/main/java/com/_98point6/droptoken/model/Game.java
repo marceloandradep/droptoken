@@ -11,6 +11,7 @@ import com._98point6.droptoken.model.interfaces.PlayerSet;
 import com.fasterxml.jackson.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @JsonPropertyOrder({ "players", "state", "winner" })
@@ -118,5 +119,37 @@ public class Game {
 
     public String getWinner() {
         return winner;
+    }
+    
+    @JsonIgnore
+    public List<Move> getMoves(Integer start, Integer until) {
+        List<Move> moves = moveList.getMoves();
+        
+        if (moves.isEmpty()) {
+            throw new NotFoundException();
+        }
+        
+        if (start != null && until != null) {
+            try {
+                moves = moves.subList(start, until);
+            } catch (IndexOutOfBoundsException e) {
+                throw new NotFoundException();
+            }
+        }
+        
+        return moves;
+    }
+
+    @JsonIgnore
+    public Move getMove(int moveNumber) {
+        Move move = null;
+        
+        try {
+            move = moveList.getMoves().get(moveNumber);
+        } catch (IndexOutOfBoundsException e) {
+            throw new NotFoundException();
+        }
+        
+        return move;
     }
 }
