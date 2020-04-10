@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class Move {
     
+    private Long id;
+    
     private MoveType type;
     
     private String player;
@@ -16,6 +18,11 @@ public class Move {
     
     public static Move quit(String player) {
         return new Move(MoveType.QUIT, player, null);
+    }
+
+    public Move(Long id, MoveType type, String player, Integer column) {
+        this(type, player, column);
+        this.id = id;
     }
 
     private Move(MoveType type, String player, Integer column) {
@@ -35,5 +42,9 @@ public class Move {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer getColumn() {
         return column;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

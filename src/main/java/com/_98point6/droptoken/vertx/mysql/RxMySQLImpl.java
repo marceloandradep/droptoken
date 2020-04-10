@@ -16,12 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @Profile("!test")
 public class RxMySQLImpl implements RxMySQL {
     
-    @Autowired
     private MySQLPool mySQLPool;
+
+    @Autowired
+    public RxMySQLImpl(MySQLPool mySQLPool) {
+        this.mySQLPool = mySQLPool;
+    }
 
     @Override
     public <T> Single<T> selectOne(String query, RxRowMapper<T> rowMapper, Object...params) {

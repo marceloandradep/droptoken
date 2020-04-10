@@ -30,5 +30,13 @@ public class GameFactory {
         
         return new Game(playerSet, moveList, board);
     }
+
+    public Game createGame(String id, List<String> players, int size) {
+        PlayerSet playerSet = playerSetFactory.create(players);
+        Board board = boardFactory.create(size);
+        MoveList moveList = moveListFactory.create();
+
+        return new Game(id, playerSet, moveList, board);
+    }
     
 }

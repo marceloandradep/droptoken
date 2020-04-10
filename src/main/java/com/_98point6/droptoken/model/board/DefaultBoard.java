@@ -63,4 +63,9 @@ public class DefaultBoard implements Board {
     public boolean hasWinner() {
         return hasWinner;
     }
+
+    @Override
+    public int getSize() {
+        return columns.length;
+    }
 }

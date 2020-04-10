@@ -4,6 +4,7 @@ import com._98point6.droptoken.exceptions.GameDoneException;
 import com._98point6.droptoken.exceptions.IllegalMoveException;
 import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
+import com._98point6.droptoken.model.constants.MoveType;
 import com._98point6.droptoken.model.interfaces.Board;
 import com._98point6.droptoken.model.constants.GameState;
 import com._98point6.droptoken.model.interfaces.MoveList;
@@ -26,6 +27,17 @@ public class Game {
     private PlayerSet playerSet;
     private MoveList moveList;
     private Board board;
+    
+    public Game(String id, GameState state) {
+        this(null, null, null);
+        this.id = id;
+        this.state = state;
+    }
+    
+    public Game(String id, PlayerSet playerSet, MoveList moveList, Board board) {
+        this(playerSet, moveList, board);
+        this.id = id;
+    }
     
     public Game(PlayerSet playerSet, MoveList moveList, Board board) {
         this.id = UUID.randomUUID().toString();
@@ -89,6 +101,14 @@ public class Game {
         return moveList.addQuit(playerId);
     }
     
+    public void applyMove(Move move) {
+        if (MoveType.MOVE.equals(move.getType())) {
+            dropToken(move.getPlayer(), move.getColumn());
+        } else {
+            quit(move.getPlayer());
+        }
+    }
+    
     @JsonIgnore
     public boolean isDone() {
         return GameState.DONE.equals(state);
@@ -120,7 +140,12 @@ public class Game {
     public String getWinner() {
         return winner;
     }
-    
+
+    @JsonIgnore
+    public Board getBoard() {
+        return board;
+    }
+
     @JsonIgnore
     public List<Move> getMoves(Integer start, Integer until) {
         List<Move> moves = moveList.getMoves();

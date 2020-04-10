@@ -29,4 +29,6 @@ public interface Board {
      */
     boolean hasWinner();
     
+    int getSize();
+    
 }
