@@ -93,4 +93,9 @@ public class DefaultPlayerSet implements PlayerSet {
         
         throw new TooManyPlayersException();
     }
+
+    @Override
+    public Player[] getPlayers() {
+        return players;
+    }
 }

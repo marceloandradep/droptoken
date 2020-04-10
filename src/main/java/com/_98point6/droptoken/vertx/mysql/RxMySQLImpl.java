@@ -13,9 +13,11 @@ import io.vertx.reactivex.sqlclient.RowSet;
 import io.vertx.reactivex.sqlclient.SqlResult;
 import io.vertx.reactivex.sqlclient.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 public class RxMySQLImpl implements RxMySQL {
     
     @Autowired

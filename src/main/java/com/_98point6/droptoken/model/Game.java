@@ -1,14 +1,22 @@
 package com._98point6.droptoken.model;
 
 import com._98point6.droptoken.exceptions.IllegalMoveException;
-import com._98point6.droptoken.exceptions.PlayerNotFoundException;
+import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
 import com._98point6.droptoken.model.interfaces.Board;
 import com._98point6.droptoken.model.constants.GameState;
 import com._98point6.droptoken.model.interfaces.MoveList;
 import com._98point6.droptoken.model.interfaces.PlayerSet;
+import com.fasterxml.jackson.annotation.*;
 
+import java.util.Arrays;
+import java.util.UUID;
+
+@JsonPropertyOrder({ "players", "state", "winner" })
+@JsonFilter("customPropertyFilter")
 public class Game {
+    
+    private String id;
     
     private GameState state;
     private String winner;
@@ -18,6 +26,7 @@ public class Game {
     private Board board;
     
     public Game(PlayerSet playerSet, MoveList moveList, Board board) {
+        this.id = UUID.randomUUID().toString();
         this.playerSet = playerSet;
         this.moveList = moveList;
         this.board = board;
@@ -31,7 +40,7 @@ public class Game {
         }
         
         if (!playerSet.contains(playerId)) {
-            throw new PlayerNotFoundException();
+            throw new NotFoundException();
         }
         
         if (!playerSet.isPlayerTurn(playerId)) {
@@ -64,7 +73,7 @@ public class Game {
         }
 
         if (!playerSet.contains(playerId)) {
-            throw new PlayerNotFoundException();
+            throw new NotFoundException();
         }
         
         playerSet.remove(playerId);
@@ -78,14 +87,35 @@ public class Game {
         return moveList.addQuit(playerId);
     }
     
+    @JsonIgnore
     public boolean isDone() {
         return GameState.DONE.equals(state);
+    }
+    
+    @JsonIgnore
+    public boolean isDraw() {
+        return board.isFull() && winner == null;
     }
     
     public void finish() {
         state = GameState.DONE;
     }
 
+    @JsonIgnore
+    public String getId() {
+        return id;
+    }
+
+    @JsonGetter("players")
+    public String[] getPlayersIds() {
+        return Arrays.stream(playerSet.getPlayers()).map(Player::getId).toArray(String[]::new);
+    }
+    
+    public GameState getState() {
+        return state;
+    }
+
+    //@JsonInclude(JsonInclude.Include.NON_NULL)
     public String getWinner() {
         return winner;
     }

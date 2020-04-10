@@ -1,7 +1,7 @@
 package com._98point6.droptoken.model;
 
 import com._98point6.droptoken.exceptions.IllegalMoveException;
-import com._98point6.droptoken.exceptions.PlayerNotFoundException;
+import com._98point6.droptoken.exceptions.NotFoundException;
 import com._98point6.droptoken.exceptions.PlayerOutOfTurnException;
 import com._98point6.droptoken.model.interfaces.Board;
 import com._98point6.droptoken.model.interfaces.MoveList;
@@ -38,7 +38,7 @@ public class GameTest {
         fail();
     }
     
-    @Test(expected = PlayerNotFoundException.class)
+    @Test(expected = NotFoundException.class)
     public void when_a_player_that_is_not_in_the_game_tries_to_play_should_throw_error() {
         String player = "invalid";
         
@@ -171,7 +171,7 @@ public class GameTest {
         fail();
     }
     
-    @Test(expected = PlayerNotFoundException.class)
+    @Test(expected = NotFoundException.class)
     public void when_a_player_tries_to_quit_a_game_which_it_does_not_belong_should_throw_error() {
         String playerId = "valid";
         

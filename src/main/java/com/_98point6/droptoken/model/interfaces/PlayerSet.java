@@ -51,5 +51,6 @@ public interface PlayerSet {
      * @return
      */
     Player getSinglePlayerLeft();
-    
+
+    Player[] getPlayers();
 }

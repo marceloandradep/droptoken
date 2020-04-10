@@ -1,8 +1,11 @@
 package com._98point6.droptoken.vertx.http.utils;
 
+import com._98point6.droptoken.exceptions.DropTokenException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.reactivex.ext.web.RoutingContext;
@@ -18,6 +21,11 @@ public class HttpUtils {
     
     static {
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+
+        FilterProvider provider = new SimpleFilterProvider()
+                .addFilter("customPropertyFilter", new CustomPropertyFilter());
+        
+        mapper.setFilterProvider(provider);
     }
     
     public static <T> T getParam(RoutingContext ctx, String name, Class<T> clazz) {
@@ -28,6 +36,8 @@ public class HttpUtils {
             value = Long.parseLong(param);
         } else if (Integer.class.isAssignableFrom(clazz)) {
             value = Integer.parseInt(param);
+        } else if (String.class.isAssignableFrom(clazz)) {
+            value = param;
         } else {
             throw new RuntimeException("Unsupported conversion (" + param + ") to (" + clazz);
         }
@@ -66,10 +76,17 @@ public class HttpUtils {
     public static void handleFailure(RoutingContext ctx, Throwable error) {
         logger.error("Unexpected error.", error);
         
-        ctx
-                .response()
-                .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
-                .end();
+        if (error instanceof DropTokenException) {
+            ctx
+                    .response()
+                    .setStatusCode(((DropTokenException)error).getStatusCode())
+                    .end();
+        } else {
+            ctx
+                    .response()
+                    .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
+                    .end();
+        }
     }
     
 }
